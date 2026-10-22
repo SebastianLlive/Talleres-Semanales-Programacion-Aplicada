@@ -13,15 +13,13 @@ public class Autenticacion {
 		return contraseña;
 	}
 
-	public void validacionAutenticacion(String usuario, String contraseña) {
-		if(usuario.equals(this.usuario) && contraseña.equals(this.contraseña)) {
-			System.out.println("______________________BIENVENIDO_________________________");
-		}else if(usuario.equals(this.usuario) && !contraseña.equals(this.contraseña)){
-			System.out.println("La contraseña es incorrecta...");
-		}else if(!usuario.equals(this.usuario) && contraseña.equals(this.contraseña)) {
-			System.out.println("El usuario es incorrecto...");
-		}else {
-			System.out.println("Usuario o contraseña incorrectos...");
-		}
+	public boolean validacionAutenticacion(String usuario, String contraseña) {
+	    if (usuario.equals(this.usuario) && contraseña.equals(this.contraseña)) {
+	        System.out.println("______________BIENVENIDO________________");
+	        return true;
+	    } else {
+	        System.out.println("Usuario o contraseña incorrectos...");
+	        return false;
+	    }
 	}
 }

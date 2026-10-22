@@ -1,0 +1,2 @@
+1;P01;Salchichas;3;2.5;7.5
+1;P01;Salchichas;2;2.5;5.0
