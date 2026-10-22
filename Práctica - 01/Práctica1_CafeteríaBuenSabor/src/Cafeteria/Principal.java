@@ -122,8 +122,7 @@ public class Principal {
                     break;
 
                 case 5:
-                    System.out.println("\n===== REPORTE DE VENTAS =====");
-                    System.out.println("El reporte de ventas está pendiente de implementar.");
+                	Reporte_Ventas.generarReporte();
                     break;
 
                 case 6:
