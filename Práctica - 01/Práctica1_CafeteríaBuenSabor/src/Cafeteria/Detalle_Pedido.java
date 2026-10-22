@@ -30,13 +30,10 @@ public class Detalle_Pedido {
 	public Double getSubtotal() {
 		return subtotal;
 	}
-
-	public void setSubtotal(Double subtotal) {
-		this.subtotal = subtotal;
-	}
+	
 	
 	public void calcularSubtotal() {
-		
+		this.subtotal = producto.getPrecio() * this.unidades;
 	}
 	
 	
