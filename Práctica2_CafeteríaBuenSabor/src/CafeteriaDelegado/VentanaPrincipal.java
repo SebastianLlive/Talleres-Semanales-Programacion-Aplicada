@@ -2,7 +2,6 @@ package CafeteriaDelegado;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -61,6 +60,16 @@ public class VentanaPrincipal extends JFrame {
             dispose();
             VentanaLogin login = new VentanaLogin();
             login.setVisible(true);
+        });
+        
+        botonPedidos.addActionListener(e -> {
+            VentanaPedidos ventana = new VentanaPedidos();
+            ventana.setVisible(true);
+        });
+        
+        botonReportes.addActionListener(e -> {
+            VentanaReportes ventana = new VentanaReportes();
+            ventana.setVisible(true);
         });
     }
 }

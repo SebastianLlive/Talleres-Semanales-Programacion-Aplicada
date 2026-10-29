@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class UtilGenerico {
 
+	@SafeVarargs
     public static <T> ArrayList<T> crearLista(T... elementos) {
         ArrayList<T> lista = new ArrayList<>();
 
@@ -14,6 +15,7 @@ public class UtilGenerico {
         return lista;
     }
 
+	@SafeVarargs
     public static <T> void agregarElementos(
             ArrayList<T> lista, T... elementos) {
 
