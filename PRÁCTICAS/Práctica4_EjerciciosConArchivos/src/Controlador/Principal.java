@@ -1,12 +1,19 @@
 
 package Controlador;
 
+import javax.swing.SwingUtilities;
+
 public class Principal {
 
     public static void main(String[] args) {
 
-        IngresosController controlador = new IngresosController();
+        SwingUtilities.invokeLater(() -> {
 
-        controlador.iniciar();
+            IngresosController controlador =
+                new IngresosController();
+
+            controlador.iniciar();
+
+        });
     }
 }

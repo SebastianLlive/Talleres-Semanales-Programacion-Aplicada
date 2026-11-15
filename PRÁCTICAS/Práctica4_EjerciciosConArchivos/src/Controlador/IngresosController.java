@@ -6,89 +6,64 @@ import java.util.ArrayList;
 import Modelo.Aportador;
 import Modelo.ProcesadorIngresos;
 import archivos.GestorArchivos;
-import Vista.MenuVista;
+import Vista.VentanaIngresos;
 
 public class IngresosController {
 
     private ProcesadorIngresos procesador;
-    private GestorArchivos gestorArchivos;
-    private MenuVista vista;
-
+    private VentanaIngresos vista;
     private ArrayList<Aportador> aportadores;
-    private boolean archivoProcesado;
 
+    // CONSTRUCTOR
     public IngresosController() {
 
         procesador = new ProcesadorIngresos();
 
-        gestorArchivos = new GestorArchivos("registro_ingresos.txt");
-
-        vista = new MenuVista();
+        vista = new VentanaIngresos();
 
         aportadores = new ArrayList<>();
 
-        archivoProcesado = false;
+        configurarEventos();
     }
 
+    // CONFIGURAR EVENTOS DE LOS BOTONES
+    private void configurarEventos() {
+
+        vista.getBtnAnalizar().addActionListener(e -> {
+            analizarArchivo();
+        });
+
+        vista.getBtnLimpiar().addActionListener(e -> {
+            limpiarResultados();
+        });
+    }
+
+    // INICIAR INTERFAZ
     public void iniciar() {
-
-        int opcion;
-
-        do {
-
-            vista.mostrarMenu();
-
-            opcion = vista.leerOpcion();
-
-            switch (opcion) {
-
-                case 1:
-                    cargarRegistros();
-                    break;
-
-                case 2:
-                    if (archivoProcesado) {
-                        vista.mostrarRegistros(aportadores);
-                    } else {
-                        vista.mostrarMensaje(
-                            "Primero analice el archivo."
-                        );
-                    }
-                    break;
-
-                case 3:
-                    if (archivoProcesado) {
-                        contarErrores();
-                    } else {
-                        vista.mostrarMensaje(
-                            "Primero analice el archivo."
-                        );
-                    }
-                    break;
-
-                case 4:
-                    vista.mostrarMensaje("Programa finalizado.");
-                    break;
-
-                default:
-                    vista.mostrarMensaje("Opcion incorrecta.");
-                    break;
-            }
-
-        } while (opcion != 4);
+        vista.setVisible(true);
     }
 
-    public void cargarRegistros() {
+    // ANALIZAR ARCHIVO
+    private void analizarArchivo() {
 
-        String contenido = gestorArchivos.leerArchivo();
+        String ruta = vista.seleccionarArchivo();
 
-        if (contenido.trim().isEmpty()) {
+        if (ruta == null) {
+            return;
+        }
 
-            archivoProcesado = false;
+        GestorArchivos gestor = new GestorArchivos(ruta);
+
+        String contenido = gestor.leerArchivo();
+
+        if (contenido.isBlank()) {
+
             aportadores.clear();
 
+            vista.limpiar();
+
             vista.mostrarMensaje(
-                "El archivo esta vacio o no se encontro."
+                "El archivo esta vacio o no se pudo leer."
             );
 
             return;
@@ -96,18 +71,64 @@ public class IngresosController {
 
         aportadores = procesador.procesarInformacion(contenido);
 
-        archivoProcesado = true;
-
-        vista.mostrarMensaje("Archivo analizado correctamente.");
-
-        vista.mostrarRegistros(aportadores);
-
-        contarErrores();
+        mostrarResultados();
     }
 
-    public double calcularTotalIngresos() {
+    // MOSTRAR REGISTROS
+    private void mostrarResultados() {
+
+        String[][] datos = new String[aportadores.size()][8];
+
+        int contador = 0;
+
+        for (Aportador a : aportadores) {
+
+            boolean valido =
+                a.isCedulaValida()
+                && a.isCorreoValido()
+                && a.isMontoValido();
+
+            datos[contador][0] = String.valueOf(contador + 1);
+
+            datos[contador][1] = a.getCedula();
+
+            datos[contador][2] = a.getCorreo();
+
+            datos[contador][3] =
+                String.format("$%.2f", a.getMonto());
+
+            datos[contador][4] =
+                a.isCedulaValida() ? "VALIDA" : "ERROR";
+
+            datos[contador][5] =
+                a.isCorreoValido() ? "VALIDO" : "ERROR";
+
+            datos[contador][6] =
+                a.isMontoValido() ? "VALIDO" : "ERROR";
+
+            datos[contador][7] =
+                valido ? "VALIDO" : "CON ERRORES";
+
+            contador++;
+        }
+
+        vista.mostrarRegistros(datos);
+
+        mostrarResumen();
+
+        vista.mostrarMensaje(
+            "Archivo analizado correctamente."
+        );
+    }
+
+    // CALCULAR INGRESOS Y ERRORES
+    private void mostrarResumen() {
 
         double total = 0;
+
+        int erroresCedula = 0;
+        int erroresCorreo = 0;
+        int erroresMonto = 0;
 
         for (Aportador a : aportadores) {
 
@@ -117,18 +138,6 @@ public class IngresosController {
 
                 total += a.getMonto();
             }
-        }
-
-        return total;
-    }
-
-    public void contarErrores() {
-
-        int erroresCedula = 0;
-        int erroresCorreo = 0;
-        int erroresMonto = 0;
-
-        for (Aportador a : aportadores) {
 
             if (!a.isCedulaValida()) {
                 erroresCedula++;
@@ -143,11 +152,23 @@ public class IngresosController {
             }
         }
 
-        vista.mostrarResumen(
-            calcularTotalIngresos(),
-            erroresCedula,
-            erroresCorreo,
-            erroresMonto
-        );
+        String resumen =
+            "========== RESUMEN GENERAL ==========\n"
+            + "Total de registros: " + aportadores.size() + "\n"
+            + String.format("Ingresos validos: $%.2f%n", total)
+            + "Cedulas con errores: " + erroresCedula + "\n"
+            + "Correos con errores: " + erroresCorreo + "\n"
+            + "Montos con errores: " + erroresMonto + "\n"
+            + "=====================================";
+
+        vista.mostrarResumen(resumen);
+    }
+
+    // LIMPIAR RESULTADOS
+    private void limpiarResultados() {
+
+        aportadores.clear();
+
+        vista.limpiar();
     }
 }
